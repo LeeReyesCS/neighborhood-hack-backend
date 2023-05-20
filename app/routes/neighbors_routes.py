@@ -4,43 +4,54 @@ from app import db
 
 from app.models.neighbors import Neighbor
 
-board_bp = Blueprint('board', __name__, url_prefix = '/neighbors')
+neighbors_bp = Blueprint('board', __name__, url_prefix = '/neighbors')
 
-@app.route('/login', methods=['POST'])
+@neighbors_bp.route('/login', methods=['POST'])
 def login():
     response = request.get_json()
-    username = response['username']
+    email = response['email']
     password = response['password']
 
-    # Find the user in your database or storage mechanism
-    user = next((user for user in users if user['username'] == username), None)
+    neighbor = Neighbor.query.filter_by(email=email).first()
 
-    if user and sha256.verify(password, user['password']):
-        return 'Login successful'
+    if neighbor and sha256.verify(password, neighbor.password):
+        return jsonify({'message': 'Login successful'})
     else:
-        return 'Invalid username or password'
+        return jsonify({'message': 'Invalid email or password'}), 401
 
 
-@app.route('/register', methods=['POST'])
+@neighbors_bp.route('/register', methods=['POST'])
 def register():
     response = request.get_json()
-    username = response['username']
-    password = response['password']
     name = response['name']
-    zipcode = response['zipcode']
+    password = response['password']
+    zipCode = response['zipcode']
     email = response['email']
     phone = response['phone']
     services = response['services']
-    skills = response ['skills']
+    skills = response['skills']
+
+    existing_neighbor = Neighbor.query.filter_by(email=email).first()
+    if existing_neighbor:
+        return jsonify({'message': 'Email already registered'}), 400
 
     hashed_password = sha256.hash(password)
 
-    # Store the user in your database or storage mechanism
-    users.append({'username': username, 'password': hashed_password})
+    new_neighbor = Neighbor(
+        name=name,
+        password=hashed_password,
+        zipcode=zipCode,
+        email=email,
+        phone=phone,
+        services=services,
+        skills=skills
+    )
+    db.session.add(new_neighbor)
+    db.session.commit()
 
-    return 'Registration successful'
+    return jsonify({'message': 'Registration successful'}), 201
 
-@app.route('/<neighbor_id>/skills', methods=['PUT'])
+@neighbors_bp.route('/<neighbor_id>/skills', methods=['PUT'])
 def update_skills(neighbor_id):
     neighbor = Neighbor.query.get(neighbor_id)
     if not neighbor:
@@ -57,14 +68,14 @@ def update_skills(neighbor_id):
 
     return jsonify({'message': 'Skills updated successfully'})
 
-@app.route('/<neighbor_id>/services', methods=['PATCH'])
+@neighbors_bp.route('/<neighbor_id>/services', methods=['PATCH'])
 def update_services(neighbor_id):
     neighbor = Neighbor.query.get(neighbor_id)
     if not neighbor:
         return jsonify({'message': 'Neighbor not found'}), 404
 
-    data = request.get_json()
-    services = data.get('services')
+    response = request.get_json()
+    services = response.get('services')
 
     if not services:
         return jsonify({'message': 'No services provided'}), 400
