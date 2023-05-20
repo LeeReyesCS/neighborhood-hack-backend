@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, make_response, abort
 from app import db
 from app.models.comments import Comment
+from app.models.neighbors import Neighbor
 
 comment_bp = Blueprint('comment', __name__, url_prefix = '/comments')
 
@@ -22,21 +23,29 @@ def validate_comment(comment_id):
 @comment_bp.route("", methods=["POST"])
 def create_comment():
     request_body = request.get_json()
-    
+
+    # Retrieve neighbor's name from the database based on the provided identifier
+    neighbor_id = request_body.get("neighbor_id")  # Assuming you have a neighbor identifier in the request
+    neighbor = Neighbor.query.get(neighbor_id)  # Assuming you have a Neighbor model and a query method
+
+    if neighbor is None:
+        return {"details": "Neighbor not found"}, 404
+
     try:
         new_comment = Comment(
-            comment_id=request_body["comment_id"],
+            neighbor_id=neighbor.neighbor_id,
             message=request_body["message"],
             timestamp=request_body["timestamp"]
         )
-    except KeyError:return {"details": "Missing Comment Descriptions"}, 400
-    
+    except KeyError:
+        return {"details": "Missing Comment Descriptions"}, 400
+
     db.session.add(new_comment)
     db.session.commit()
-    
+
     return {
         "comment": {
-            "comment_id": new_comment.comment_id,
+            "neighbor_id": new_comment.neighbor_id,
             "message": new_comment.message,
             "timestamp": new_comment.timestamp
         }
