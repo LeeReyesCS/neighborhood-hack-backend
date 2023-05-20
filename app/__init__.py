@@ -22,7 +22,7 @@ def create_app(test_config=None):
             "SQLALCHEMY_DATABASE_URI")
 
     # Import models here for Alembic setup
-    from app.models.users import User
+    from app.models.neighbors import Neighbor
     from app.models.boards import Board
     from app.models.comments import Comment
 
