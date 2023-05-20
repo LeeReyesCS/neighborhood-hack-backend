@@ -25,6 +25,26 @@ def get_all_neighbors():
     
     return jsonify(neighbor_list)
 
+@neighbor_bp.route('/<neighbor_id>', methods=['GET'])
+def get_neighbor(neighbor_id):
+    neighbor = Neighbor.query.get(neighbor_id)
+
+    if not neighbor:
+        return jsonify({'message': 'Neighbor not found'}), 404
+
+    neighbor_data = {
+        'id': neighbor.neighbor_id,
+        'name': neighbor.name,
+        'zipcode': neighbor.zipcode,
+        'email': neighbor.email,
+        'phone': neighbor.phone,
+        'services': neighbor.services,
+        'skills': neighbor.skills
+    }
+
+    return jsonify(neighbor_data)
+
+
 
 @neighbor_bp.route('/login', methods=['POST'])
 def login():
