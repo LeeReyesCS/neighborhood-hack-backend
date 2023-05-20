@@ -1,8 +1,22 @@
-from flask import Blueprint, jsonify, request, make_response
+from flask import Blueprint, jsonify, request, make_response, abort
 from app import db
 from app.models.comments import Comment
 
 comment_bp = Blueprint('comment', __name__, url_prefix = '/comments')
+
+## Validate comment helper function
+def validate_comment(comment_id):
+    try:
+        comment_id = int(comment_id)
+    except:
+        abort(make_response({"message": f"Comment {comment_id} invalid"}, 400))
+
+    entry = Comment.query.get(comment_id)
+
+    if not entry:
+        abort(make_response({"message":f"Comment {comment_id} not found"}, 404))
+
+    return comment
 
 # Post a comment
 @comment_bp.route("", methods=["POST"])
