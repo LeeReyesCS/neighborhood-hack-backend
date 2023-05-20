@@ -1,4 +1,6 @@
 from app import db
+from app.models.comments import Comment
+from app.models.neighbors import Neighbor
 
 class Board(db.Model):
     board_id = db.Column(db.Integer, autoincrement = True, primary_key = True)
@@ -8,7 +10,7 @@ class Board(db.Model):
     message = db.Column(db.String, nullable=False)
     neighbor_id = db.Column(db.Integer, db.ForeignKey("neighbor.neighbor_id"))
     # relationship with comments
-    comments = db.relationship("Comments", backref="boards", lazy=True) 
+    comment = db.relationship("Comment", backref="board", lazy=True) 
 
 
     def to_dict(self):

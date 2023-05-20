@@ -11,6 +11,6 @@ class Neighbor(db.Model):
     services = db.Column(db.ARRAY(db.String))
     skills = db.Column(db.ARRAY(db.String))
     # relationship with boards
-    boards = db.relationship("Board", backref="neighbor", lazy=True)
+    board = db.relationship("Board", backref="neighbor", lazy=True)
     # relationship with comments
-    comments = db.relationship("Comment", backref="neighbor", lazy=True)
+    comment = db.relationship("Comment", backref="neighbor", lazy=True)
