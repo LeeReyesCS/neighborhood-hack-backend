@@ -1,7 +1,8 @@
-from flask import Blueprint, jsonify, request, make_response
+from flask import Blueprint, jsonify, request, make_response, current_app
 from passlib.hash import pbkdf2_sha256 as sha256
+from flask_jwt_extended import create_access_token
+from datetime import datetime, timedelta
 from app import db 
-
 from app.models.neighbors import Neighbor
 
 neighbor_bp = Blueprint('neighbors', __name__, url_prefix = '/neighbors')
@@ -55,10 +56,15 @@ def login():
     neighbor = Neighbor.query.filter_by(email=email).first()
 
     if neighbor and sha256.verify(password, neighbor.password):
-        return jsonify({'message': 'Login successful'})
+        # Generate JWT token
+        token = create_access_token(
+            identity=neighbor.neighbor_id,
+            expires_delta=timedelta(hours=1)
+        )
+
+        return jsonify({'token': token, 'message': 'Login successful'})
     else:
         return jsonify({'message': 'Invalid email or password'}), 401
-
 
 @neighbor_bp.route('/register', methods=['POST'])
 def register():
@@ -89,7 +95,13 @@ def register():
     db.session.add(new_neighbor)
     db.session.commit()
 
-    return jsonify({'message': 'Registration successful'}), 201
+    # Generate JWT token
+    token = create_access_token(
+            identity=new_neighbor.neighbor_id,
+            expires_delta=timedelta(hours=1)
+        )
+
+    return jsonify({'token': token, 'message': 'Registration successful'}), 201
 
 @neighbor_bp.route('/<neighbor_id>/skills', methods=['PUT'])
 def update_skills(neighbor_id):
