@@ -49,7 +49,7 @@ def get_all_comments():
     comments = Comment.query.all()
     comments_response = []
 
-    for words in comments:
+    for comment in comments:
         comments_response.append(
             {
             "comment_id": comment.comment_id,
