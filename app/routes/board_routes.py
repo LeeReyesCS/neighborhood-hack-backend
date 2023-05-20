@@ -26,7 +26,7 @@ def get_all_boards():
 @board_bp.route("/<board_id>", methods = ['GET'])
 def get_one_board(board_id):
     one_board = Board.query.get(board_id)
-    one_board_response = {"Board": order.to_dict() }
+    one_board_response = {"Board": one_board.to_dict() }
     return jsonify(one_board_response),200
 
 @board_bp.route("", methods = ['POST'])

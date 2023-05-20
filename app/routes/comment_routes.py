@@ -11,9 +11,9 @@ def validate_comment(comment_id):
     except:
         abort(make_response({"message": f"Comment {comment_id} invalid"}, 400))
 
-    entry = Comment.query.get(comment_id)
+    comment = Comment.query.get(comment_id)
 
-    if not entry:
+    if not comment:
         abort(make_response({"message":f"Comment {comment_id} not found"}, 404))
 
     return comment
@@ -49,7 +49,7 @@ def get_all_comments():
     comments = Comment.query.all()
     comments_response = []
 
-    for words in comments:
+    for comment in comments:
         comments_response.append(
             {
             "comment_id": comment.comment_id,
