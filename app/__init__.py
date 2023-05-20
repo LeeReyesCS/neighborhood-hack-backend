@@ -30,6 +30,12 @@ def create_app(test_config=None):
     migrate.init_app(app, db)
 
     # Register Blueprints here
+    from .routes.neighbors_routes import neighbor_bp
+    app.register_blueprint(neighbor_bp)
+    from .routes.board_routes import board_bp
+    app.register_blueprint(board_bp)
+    from .routes.comment_routes import comment_bp
+    app.register_blueprint(comment_bp)
     
     
     CORS(app)

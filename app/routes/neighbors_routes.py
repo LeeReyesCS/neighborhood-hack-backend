@@ -4,9 +4,9 @@ from app import db
 
 from app.models.neighbors import Neighbor
 
-neighbors_bp = Blueprint('board', __name__, url_prefix = '/neighbors')
+neighbor_bp = Blueprint('board', __name__, url_prefix = '/neighbors')
 
-@neighbors_bp.route('/login', methods=['POST'])
+@neighbor_bp.route('/login', methods=['POST'])
 def login():
     response = request.get_json()
     email = response['email']
@@ -20,7 +20,7 @@ def login():
         return jsonify({'message': 'Invalid email or password'}), 401
 
 
-@neighbors_bp.route('/register', methods=['POST'])
+@neighbor_bp.route('/register', methods=['POST'])
 def register():
     response = request.get_json()
     name = response['name']
@@ -51,7 +51,7 @@ def register():
 
     return jsonify({'message': 'Registration successful'}), 201
 
-@neighbors_bp.route('/<neighbor_id>/skills', methods=['PUT'])
+@neighbor_bp.route('/<neighbor_id>/skills', methods=['PUT'])
 def update_skills(neighbor_id):
     neighbor = Neighbor.query.get(neighbor_id)
     if not neighbor:
@@ -68,7 +68,7 @@ def update_skills(neighbor_id):
 
     return jsonify({'message': 'Skills updated successfully'})
 
-@neighbors_bp.route('/<neighbor_id>/services', methods=['PATCH'])
+@neighbor_bp.route('/<neighbor_id>/services', methods=['PATCH'])
 def update_services(neighbor_id):
     neighbor = Neighbor.query.get(neighbor_id)
     if not neighbor:
