@@ -9,3 +9,13 @@ class Board(db.Model):
     neighbor_id = db.Column(db.Integer, db.ForeignKey("neighbor.neighbor_id"))
     # relationship with comments
     comments = db.relationship("Comments", backref="boards", lazy=True) 
+
+
+    def to_dict(self):
+        return {
+            "board_id": self.board_id,
+            "board_title": self.board_title,
+            "looking_for": self.looking_for,
+            "timestamp": self.timestamp,
+            "message": self.message
+        }
