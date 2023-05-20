@@ -4,7 +4,7 @@ from app import db
 
 from app.models.neighbors import Neighbor
 
-neighbor_bp = Blueprint('board', __name__, url_prefix = '/neighbors')
+neighbor_bp = Blueprint('neighbors', __name__, url_prefix = '/neighbors')
 
 @neighbor_bp.route('/login', methods=['POST'])
 def login():
@@ -39,7 +39,7 @@ def register():
 
     new_neighbor = Neighbor(
         name=name,
-        password=hashed_password,
+        password=password,
         zipcode=zipCode,
         email=email,
         phone=phone,
