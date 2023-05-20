@@ -4,6 +4,30 @@ from app.models.comments import Comment
 
 comment_bp = Blueprint('comment', __name__, url_prefix = '/comments')
 
+# Post a comment
+@comment_bp.route("", methods=["POST"])
+def create_comment():
+    request_body = request.get_json()
+    
+    try:
+        new_comment = Comment(
+            comment_id=request_body["comment_id"],
+            message=request_body["message"],
+            timestamp=request_body["timestamp"]
+        )
+    except KeyError:return {"details": "Missing Comment Descriptions"}, 400
+    
+    db.session.add(new_comment)
+    db.session.commit()
+    
+    return {
+        "comment": {
+            "comment_id": new_comment.comment_id,
+            "message": new_comment.message,
+            "timestamp": new_comment.timestamp
+        }
+    }, 201
+    
 #Get all comments
 @comment_bp.route("", methods = ['GET'])
 def get_all_comments():
