@@ -39,7 +39,7 @@ def register():
 
     new_neighbor = Neighbor(
         name=name,
-        password=password,
+        password=hashed_password,
         zipcode=zipCode,
         email=email,
         phone=phone,
