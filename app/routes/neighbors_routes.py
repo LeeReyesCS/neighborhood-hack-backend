@@ -52,6 +52,8 @@ def login():
     response = request.get_json()
     email = response['email']
     password = response['password']
+    neighbor_id = request.json.get('neighbor_id')
+
 
     neighbor = Neighbor.query.filter_by(email=email).first()
 
@@ -62,7 +64,7 @@ def login():
             expires_delta=timedelta(hours=1)
         )
 
-        return jsonify({'token': token, 'message': 'Login successful'})
+        return jsonify({'token': token, "neighbor_id":neighbor.neighbor_id, 'message': 'Login successful'})
     else:
         return jsonify({'message': 'Invalid email or password'}), 401
 
