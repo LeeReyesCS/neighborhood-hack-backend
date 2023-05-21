@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, make_response
 from app import db
 from app.models.boards import Board
+from app.models.comments import Comment
 
 board_bp = Blueprint('board', __name__, url_prefix = '/boards')
 
@@ -77,3 +78,70 @@ def update_board(board_id):
     db.session.commit()
 
     return jsonify({"Board": board.to_dict()})
+
+################################################
+#  create a new comment to a board by id
+@board_bp.route("/<board_id>/comments", methods=["POST"])
+def create_comment_to_board(board_id):   
+    # board = validate_model(Board, board_id)
+    # board = validate_board(board_id)
+    
+    board = Board.query.get(board_id)
+
+    if not board:
+        return {"error": "Board not found"}, 404
+
+    request_body = request.get_json()
+    try:
+        # new_comment = Comment.from_dict(request_body)
+        new_comment = Comment(
+            message=request_body["message"],
+            timestamp=request_body["timestamp"],
+            board_id=board.board_id
+        )
+    except KeyError:
+        return {"details": "Missing Data"}, 400
+    
+    db.session.add(new_comment)
+    db.session.commit()
+
+    return {
+        "comment" : {
+            "id": new_comment.comment_id,
+            "message": new_comment.message,
+            "timestamp": new_comment.timestamp,
+            "board_id": new_comment.board_id
+        }
+    }, 201
+
+# GET all comments by a specific board
+@board_bp.route("<board_id>/comments", methods=["GET"])
+def read_all_comments_by_board(board_id):
+    # board = validate_model(Board, board_id)
+    # board = validate_board(board_id)
+    comments = Comment.query.filter_by(board_id=board_id).all()
+    comments_response = []
+    # comments_response = [comment.to_dict() for comment in board.comments]
+
+    for comment in comments:
+        comments_response.append(
+            {
+                "id": comment.comment_id,
+                "message": comment.message,
+                "timestamp": comment.timestamp,
+                "board_id": comment.board_id
+            }
+        )
+    return jsonify(comments_response)
+
+@board_bp.route("/<board_id>/comments/<comment_id>", methods=['DELETE'])
+def delete_comment(board_id, comment_id):
+    comment = Comment.query.get(comment_id)
+
+    if not comment:
+        return {"error": "Comment not found"}, 404
+
+    db.session.delete(comment)
+    db.session.commit()
+
+    return {"comment_deleted": comment.to_dict()}
